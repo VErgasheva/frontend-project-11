@@ -5,4 +5,16 @@ export default {
     path: new URL('./dist', import.meta.url).pathname,
   },
   mode: 'development',
+  module: {
+    rules: [
+      {
+        test: /\.scss$/i,
+        use: [
+          'style-loader',
+          'css-loader',
+          'sass-loader'
+        ],
+      },
+    ],
+  },
 };
