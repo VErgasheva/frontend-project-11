@@ -1,17 +1,28 @@
 import * as yup from 'yup';
+import { i18next } from './i18n.js';
 
 const getValidationSchema = (feeds) => (
   yup.object().shape({
     url: yup
       .string()
-      .required('Введите адрес')
-      .url('Некорректный адрес')
-      .notOneOf(feeds.map((f) => f.url), 'RSS уже добавлен'),
+      .required('form.errors.required')
+      .url('form.errors.url')
+      .notOneOf(feeds.map((f) => f.url), 'form.errors.notOneOf'),
   })
 );
 
 export default (elements, state) => {
   const { form, input } = elements;
+
+  yup.setLocale({
+    mixed: {
+      required: 'form.errors.required',
+      notOneOf: 'form.errors.notOneOf',
+    },
+    string: {
+      url: 'form.errors.url',
+    },
+  });
 
   const validate = (url, feeds) => {
     const schema = getValidationSchema(feeds);
@@ -36,10 +47,11 @@ export default (elements, state) => {
       elements.infoText.classList.add('d-none');
     } catch (err) {
       state.form.valid = false;
-      state.form.error = err.errors ? err.errors[0] : 'Ошибка валидации';
+      const code = err.errors ? err.errors[0] : 'form.errors.default';
+      state.form.error = code;
 
       input.classList.add('is-invalid');
-      elements.infoText.textContent = state.form.error;
+      elements.infoText.textContent = i18next.t(code);
       elements.infoText.classList.remove('d-none');
     }
   });
@@ -51,8 +63,9 @@ export default (elements, state) => {
       input.classList.remove('is-invalid');
       elements.infoText.classList.add('d-none');
     } catch (err) {
+      const code = err.errors ? err.errors[0] : '';
       input.classList.add('is-invalid');
-      elements.infoText.textContent = err.errors ? err.errors[0] : '';
+      elements.infoText.textContent = i18next.t(code);
       elements.infoText.classList.remove('d-none');
     }
   });

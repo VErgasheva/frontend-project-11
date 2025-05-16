@@ -1,6 +1,8 @@
+import { i18next } from './i18n.js';
+
 export default (elements, state) => {
   const { input, infoText } = elements;
- 
+
   const renderForm = () => {
     if (state.form.valid) {
       input.classList.remove('is-invalid');
@@ -8,10 +10,10 @@ export default (elements, state) => {
       infoText.textContent = '';
     } else {
       input.classList.add('is-invalid');
-      infoText.textContent = state.form.error;
+      infoText.textContent = i18next.t(state.form.error || 'form.errors.default');
       infoText.classList.remove('d-none');
     }
   };
- 
+
   state.renderForm = renderForm;
 };
