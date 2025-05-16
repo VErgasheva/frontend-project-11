@@ -32,7 +32,6 @@ export default {
     }),
     new CopyWebpackPlugin({
       patterns: [
-        { from: 'index.html', to: '' },
         { from: 'eslint.config.js', to: '' },
         { from: 'webpack.config.js', to: '' },
         { from: 'vercel.json', to: '' },
