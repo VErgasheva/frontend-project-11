@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const state = {
     feeds: [],
+    posts: [],
     form: {
       valid: true,
       error: null,

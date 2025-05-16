@@ -1,4 +1,4 @@
-import { i18next } from './i18n.js';
+import i18next from 'i18next';
 
 export default (elements, state) => {
   const { input, infoText } = elements;
@@ -9,11 +9,12 @@ export default (elements, state) => {
       infoText.classList.add('d-none');
       infoText.textContent = '';
     } else {
-      input.classList.add('is-invalid');
+      input.classList.add('is-invalid'); 
       infoText.textContent = i18next.t(state.form.error || 'form.errors.default');
       infoText.classList.remove('d-none');
     }
-  };
+  }; 
+  if (!state.posts) state.posts = [];
 
   state.renderForm = renderForm;
 };
