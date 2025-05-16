@@ -1,8 +1,11 @@
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+
 export default {
   entry: './src/index.js',
   output: {
     filename: 'main.js',
     path: new URL('./dist', import.meta.url).pathname,
+    clean: true, 
   },
   mode: 'development',
   module: {
@@ -17,4 +20,9 @@ export default {
       },
     ],
   },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './index.html',
+    }),
+  ],
 };
