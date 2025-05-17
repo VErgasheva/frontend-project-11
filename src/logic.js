@@ -14,6 +14,49 @@ const getValidationSchema = (feeds) => (
 );
 
 const getProxyUrl = (url) => `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`;
+function startRssUpdates(state, updatePostsCallback) {
+  const checkFeeds = () => {
+    if (state.feeds.length === 0) {
+      setTimeout(checkFeeds, 5000);
+      return;
+    }
+
+    const feedPromises = state.feeds.map((feed) =>
+      fetch(getProxyUrl(feed.url))
+        .then((response) => {
+          if (!response.ok) throw new Error('network');
+          return response.json();
+        })
+        .then((data) => {
+          const { posts } = parseRss(data.contents);
+          const existingLinks = state.posts
+            .filter((p) => p.feedId === feed.id)
+            .map((p) => p.link);
+
+          const newPosts = posts
+            .filter((post) => !existingLinks.includes(post.link))
+            .map((post) => ({
+              ...post,
+              feedId: feed.id,
+              id: `post-${Date.now()}-${Math.random()}`,
+            }));
+
+          if (newPosts.length > 0) {
+            state.posts.push(...newPosts);
+            updatePostsCallback(state.posts);
+          }
+        })
+        .catch(() => {
+        })
+    );
+
+    Promise.all(feedPromises)
+      .finally(() => {
+        setTimeout(checkFeeds, 5000);
+      });
+  };
+  setTimeout(checkFeeds, 5000);
+}
 
 export default (elements, state) => {
   const { form, input, infoText } = elements;
@@ -33,6 +76,8 @@ export default (elements, state) => {
     return schema.validate({ url }, { abortEarly: false });
   };
 
+  startRssUpdates(state, renderPosts);
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const url = input.value.trim();
@@ -43,7 +88,6 @@ export default (elements, state) => {
       state.form.valid = true;
       state.form.error = null;
 
-      // Загрузка RSS
       showInfo(i18next.t('form.success'), infoText);
       input.setAttribute('readonly', true);
 
@@ -54,8 +98,6 @@ export default (elements, state) => {
         })
         .then((data) => {
           const { feed, posts } = parseRss(data.contents);
-
-          // Генерируем id
           const feedId = `feed-${Date.now()}-${Math.random()}`;
           const feedData = {
             id: feedId,
