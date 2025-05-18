@@ -15,6 +15,7 @@ export default (elements, state) => {
     }
   }; 
   if (!state.posts) state.posts = [];
+  if (!state.readPosts) state.readPosts = new Set();
 
   state.renderForm = renderForm;
 };

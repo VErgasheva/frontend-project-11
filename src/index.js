@@ -24,6 +24,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     infoText: document.getElementById('info_text'),
   };
 
+  let feedsList = document.getElementById('feeds_list');
+  if (!feedsList) {
+    feedsList = document.createElement('ul');
+    feedsList.id = 'feeds_list';
+    feedsList.className = 'list-group mb-3';
+    document.querySelector('.feeds')?.appendChild(feedsList);
+  }
+  let postsList = document.getElementById('posts_list');
+  if (!postsList) {
+    postsList = document.createElement('ul');
+    postsList.id = 'posts_list';
+    postsList.className = 'list-group';
+    document.querySelector('.posts')?.appendChild(postsList);
+  }
+  
   const state = {
     feeds: [],
     posts: [],

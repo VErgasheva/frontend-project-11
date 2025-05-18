@@ -14,6 +14,7 @@ const getValidationSchema = (feeds) => (
 );
 
 const getProxyUrl = (url) => `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`;
+
 function startRssUpdates(state, updatePostsCallback) {
   const checkFeeds = () => {
     if (state.feeds.length === 0) {
@@ -43,7 +44,7 @@ function startRssUpdates(state, updatePostsCallback) {
 
           if (newPosts.length > 0) {
             state.posts.push(...newPosts);
-            updatePostsCallback(state.posts);
+            updatePostsCallback(state.posts, state);
           }
         })
         .catch(() => {
@@ -57,7 +58,6 @@ function startRssUpdates(state, updatePostsCallback) {
   };
   setTimeout(checkFeeds, 5000);
 }
-
 export default (elements, state) => {
   const { form, input, infoText } = elements;
 
@@ -116,7 +116,7 @@ export default (elements, state) => {
           });
 
           renderFeeds(state.feeds);
-          renderPosts(state.posts);
+          renderPosts(state.posts, state);
 
           form.reset();
           input.classList.remove('is-invalid');
