@@ -13,7 +13,7 @@ const getValidationSchema = (feeds) => (
   })
 );
 
-const getProxyUrl = (url) => `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`;
+const getProxyUrl = (url) => https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)};
 
 function startRssUpdates(state, updatePostsCallback) {
   const checkFeeds = () => {
@@ -21,7 +21,6 @@ function startRssUpdates(state, updatePostsCallback) {
       setTimeout(checkFeeds, 5000);
       return;
     }
-
     const feedPromises = state.feeds.map((feed) =>
       fetch(getProxyUrl(feed.url))
         .then((response) => {
@@ -39,7 +38,7 @@ function startRssUpdates(state, updatePostsCallback) {
             .map((post) => ({
               ...post,
               feedId: feed.id,
-              id: `post-${Date.now()}-${Math.random()}`,
+              id: post-${Date.now()}-${Math.random()},
             }));
 
           if (newPosts.length > 0) {
@@ -47,10 +46,8 @@ function startRssUpdates(state, updatePostsCallback) {
             updatePostsCallback(state.posts, state);
           }
         })
-        .catch(() => {
-        })
+        .catch(() => {})
     );
-
     Promise.all(feedPromises)
       .finally(() => {
         setTimeout(checkFeeds, 5000);
@@ -58,6 +55,7 @@ function startRssUpdates(state, updatePostsCallback) {
   };
   setTimeout(checkFeeds, 5000);
 }
+
 export default (elements, state) => {
   const { form, input, infoText } = elements;
 
@@ -97,7 +95,13 @@ export default (elements, state) => {
           return response.json();
         })
         .then((data) => {
-          const { feed, posts } = parseRss(data.contents);
+          let feed, posts;
+          try {
+            ({ feed, posts } = parseRss(data.contents));
+          } catch (err) {
+            if (err.isParsing) throw new Error('rss.invalid');
+            throw err;
+          }
           const feedId = `feed-${Date.now()}-${Math.random()}`;
           const feedData = {
             id: feedId,
@@ -127,11 +131,11 @@ export default (elements, state) => {
         .catch((err) => {
           let message;
           if (err.message === 'network') {
-            message = 'Ошибка сети. Попробуйте ещё раз.';
-          } else if (err.isParsing) {
-            message = 'Ошибка чтения RSS. Проверьте ссылку.';
+            message = i18next.t('network');
+          } else if (err.message === 'rss.invalid') {
+            message = i18next.t('rss.invalid');
           } else {
-            message = 'Неизвестная ошибка.';
+            message = i18next.t('form.errors.default');
           }
           showError(message, infoText);
           input.removeAttribute('readonly');
@@ -140,12 +144,12 @@ export default (elements, state) => {
       state.form.valid = false;
       const code = err.errors ? err.errors[0] : 'form.errors.default';
       state.form.error = code;
-
       input.classList.add('is-invalid');
       infoText.textContent = i18next.t(code);
       infoText.classList.remove('d-none');
     }
   });
+
   input.addEventListener('input', async () => {
     const url = input.value.trim();
     try {

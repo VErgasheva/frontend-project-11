@@ -1,3 +1,5 @@
+import { i18next } from './i18n.js';
+
 export function renderFeeds(feeds) {
   const feedsList = document.getElementById('feeds_list');
   if (!feedsList) return;
@@ -8,7 +10,6 @@ export function renderFeeds(feeds) {
     li.innerHTML = `<h5>${feed.title}</h5><p>${feed.description}</p>`;
     feedsList.appendChild(li);
   });
-  document.getElementById('main_container')?.classList.remove('d-none');
 }
 
 export function renderPosts(posts, state) {
@@ -25,17 +26,12 @@ export function renderPosts(posts, state) {
     link.rel = 'noopener noreferrer';
     link.textContent = post.title;
     link.dataset.id = post.id;
-
-    if (state.readPosts.has(post.id)) {
-      link.className = 'fw-normal';
-    } else {
-      link.className = 'fw-bold';
-    }
+    link.className = state.readPosts.has(post.id) ? 'fw-normal' : 'fw-bold';
 
     const previewBtn = document.createElement('button');
     previewBtn.type = 'button';
     previewBtn.className = 'btn btn-outline-primary btn-sm ms-2 preview-btn';
-    previewBtn.textContent = 'Предпросмотр';
+    previewBtn.textContent = i18next.t('modal.fullArticle');
     previewBtn.dataset.id = post.id;
 
     previewBtn.addEventListener('click', (e) => {
@@ -47,7 +43,6 @@ export function renderPosts(posts, state) {
       modalEl.querySelector('.modal-body').textContent = post.description;
       const fullArticleLink = modalEl.querySelector('.full-article');
       if (fullArticleLink) fullArticleLink.href = post.link;
-
       const modal = new window.bootstrap.Modal(modalEl);
       modal.show();
     });
@@ -62,6 +57,7 @@ export function renderPosts(posts, state) {
     postsList.appendChild(li);
   });
 }
+
 export function showInfo(message, infoText) {
   infoText.textContent = message;
   infoText.classList.remove('d-none', 'text-danger');
