@@ -13,8 +13,7 @@ const getValidationSchema = (feeds) => (
   })
 );
 
-const getProxyUrl = (url) => https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)};
-
+const getProxyUrl = (url) => `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`;
 function startRssUpdates(state, updatePostsCallback) {
   const checkFeeds = () => {
     if (state.feeds.length === 0) {
@@ -38,7 +37,7 @@ function startRssUpdates(state, updatePostsCallback) {
             .map((post) => ({
               ...post,
               feedId: feed.id,
-              id: post-${Date.now()}-${Math.random()},
+              id: `post-${Date.now()}-${Math.random()}`,
             }));
 
           if (newPosts.length > 0) {
