@@ -121,6 +121,10 @@ export default (elements, state) => {
           renderFeeds(state.feeds);
           renderPosts(state.posts, state);
 
+          if (typeof showFeedsAndPosts === 'function') {
+            showFeedsAndPosts();
+          }
+
           form.reset();
           input.classList.remove('is-invalid');
           input.removeAttribute('readonly');
