@@ -1,4 +1,4 @@
-import '../styles.scss';
+import './styles.scss';
 import 'bootstrap';
 import initView from './view.js';
 import initLogic from './logic.js';
