@@ -75,6 +75,8 @@ export default (elements, state) => {
     },
   });
 
+  let rssLoaded = false;
+
   const validate = (url, feeds) => {
     const schema = getValidationSchema(feeds);
     return schema.validate({ url }, { abortEarly: false });
@@ -93,6 +95,7 @@ export default (elements, state) => {
       state.form.error = null;
 
       showInfo(i18next.t('form.success'), infoText);
+      rssLoaded = true;
       input.setAttribute('readonly', true);
 
       fetch(getProxyUrl(url))
@@ -119,7 +122,7 @@ export default (elements, state) => {
 
           posts.forEach((post) => {
             state.posts.push({
-              ...post,
+              post,
               feedId,
               id: `post-${Date.now()}-${Math.random()}`,
             });
@@ -133,7 +136,6 @@ export default (elements, state) => {
           input.classList.remove('is-invalid');
           input.removeAttribute('readonly');
           input.focus();
-          infoText.classList.add('d-none');
         })
         .catch((err) => {
           let message;
@@ -154,6 +156,8 @@ export default (elements, state) => {
       input.classList.add('is-invalid');
       infoText.textContent = i18next.t(code);
       infoText.classList.remove('d-none');
+      infoText.classList.remove('text-success');
+      infoText.classList.add('text-danger');
     }
   });
   input.addEventListener('input', async () => {
@@ -161,12 +165,20 @@ export default (elements, state) => {
     try {
       await validate(url, state.feeds);
       input.classList.remove('is-invalid');
-      infoText.classList.add('d-none');
+      if (!rssLoaded) {
+        infoText.classList.add('d-none');
+      } else {
+        infoText.textContent = i18next.t('form.success');
+        infoText.classList.remove('d-none', 'text-danger');
+        infoText.classList.add('text-success');
+      }
     } catch (err) {
       const code = err.errors ? err.errors[0] : '';
       input.classList.add('is-invalid');
       infoText.textContent = i18next.t(code);
       infoText.classList.remove('d-none');
+      infoText.classList.remove('text-success');
+      infoText.classList.add('text-danger');
     }
   });
 };
