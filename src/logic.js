@@ -14,6 +14,7 @@ const getValidationSchema = (feeds) => (
 );
 
 const getProxyUrl = (url) => `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`;
+
 function startRssUpdates(state, updatePostsCallback) {
   const checkFeeds = () => {
     if (state.feeds.length === 0) {
@@ -54,8 +55,7 @@ function startRssUpdates(state, updatePostsCallback) {
   };
   setTimeout(checkFeeds, 5000);
 }
-
-export default (elements, state) => {
+export default (elements, state, showFeedsAndPosts) => {
   const { form, input, infoText } = elements;
 
   yup.setLocale({
@@ -121,6 +121,7 @@ export default (elements, state) => {
           renderFeeds(state.feeds);
           renderPosts(state.posts, state);
 
+          // === Вот здесь вызываем showFeedsAndPosts ===
           if (typeof showFeedsAndPosts === 'function') {
             showFeedsAndPosts();
           }
@@ -152,8 +153,8 @@ export default (elements, state) => {
       infoText.classList.remove('d-none');
     }
   });
-
-  input.addEventListener('input', async () => {
+input
+.addEventListener('input', async () => {
     const url = input.value.trim();
     try {
       await validate(url, state.feeds);
