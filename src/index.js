@@ -4,11 +4,6 @@ import initView from './view.js';
 import initLogic from './logic.js';
 import initI18n, { i18next } from './i18n.js';
 
-function showFeedsAndPosts() {
-  document.querySelector('.posts').classList.remove('d-none');
-  document.querySelector('.feeds').classList.remove('d-none');
-}
-
 document.addEventListener('DOMContentLoaded', async () => {
   await initI18n();
 
@@ -37,5 +32,5 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   initView(elements, state);
-  initLogic(elements, state, showFeedsAndPosts);
+  initLogic(elements, state);
 });

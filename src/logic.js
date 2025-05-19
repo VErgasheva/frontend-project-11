@@ -55,7 +55,14 @@ function startRssUpdates(state, updatePostsCallback) {
   };
   setTimeout(checkFeeds, 5000);
 }
-export default (elements, state, showFeedsAndPosts) => {
+function showFeedsAndPosts() {
+  const postsBlock = document.querySelector('.posts');
+  const feedsBlock = document.querySelector('.feeds');
+  if (postsBlock) postsBlock.classList.remove('d-none');
+  if (feedsBlock) feedsBlock.classList.remove('d-none');
+}
+
+export default (elements, state) => {
   const { form, input, infoText } = elements;
 
   yup.setLocale({
@@ -120,11 +127,7 @@ export default (elements, state, showFeedsAndPosts) => {
 
           renderFeeds(state.feeds);
           renderPosts(state.posts, state);
-
-          // === Вот здесь вызываем showFeedsAndPosts ===
-          if (typeof showFeedsAndPosts === 'function') {
-            showFeedsAndPosts();
-          }
+          showFeedsAndPosts();
 
           form.reset();
           input.classList.remove('is-invalid');
@@ -153,8 +156,7 @@ export default (elements, state, showFeedsAndPosts) => {
       infoText.classList.remove('d-none');
     }
   });
-input
-.addEventListener('input', async () => {
+  input.addEventListener('input', async () => {
     const url = input.value.trim();
     try {
       await validate(url, state.feeds);

@@ -7,7 +7,7 @@ const resources = {
       'form.add': 'Добавить',
       'form.example': 'Пример: https://lorem-rss.hexlet.app/feed',
       'form.success': 'RSS успешно загружен',
-      'form.errors.required': 'Не должно быть пустым',
+      'form.errors.required': 'Заполни это поле',
       'form.errors.url': 'Ссылка должна быть валидным URL',
       'form.errors.notOneOf': 'RSS уже существует',
       'form.errors.default': 'Ошибка валидации',
