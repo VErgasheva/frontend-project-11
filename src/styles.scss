@@ -1,2 +1,10 @@
 @use "bootstrap/scss/bootstrap";
-
+.feed-description-fade {
+  display: block;
+  max-height: 3.6em;
+  overflow: hidden;
+  position: relative;
+  color: #bbb;
+  mask-image: linear-gradient(180deg, #000 60%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, #000 60%, transparent 100%);
+}
