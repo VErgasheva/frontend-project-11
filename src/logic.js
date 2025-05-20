@@ -122,7 +122,7 @@ export default (elements, state) => {
 
           posts.forEach((post) => {
             state.posts.push({
-              post,
+              ...post,
               feedId,
               id: `post-${Date.now()}-${Math.random()}`,
             });
