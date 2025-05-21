@@ -1,21 +1,20 @@
 import * as yup from 'yup';
 import { i18next } from './i18n.js';
 import parseRss from './rssParser.js';
-import { renderFeeds, renderPosts, showInfo, showError } from './ui.js';
 
 const getValidationSchema = (feeds) => (
   yup.object().shape({
     url: yup
       .string()
-      .required('form.errors.required')
-      .url('form.errors.url')
-      .notOneOf(feeds.map((f) => f.url), 'form.errors.notOneOf'),
+      .required('Заполни это поле')
+      .url('Ссылка должна быть валидным URL')
+      .notOneOf(feeds.map((f) => f.url), 'RSS уже существует'),
   })
 );
 
-const getProxyUrl = (url) => `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`;
+const getProxyUrl = (url) => https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)};
 
-function startRssUpdates(state, updatePostsCallback) {
+function startRssUpdates(state) {
   const checkFeeds = () => {
     if (state.feeds.length === 0) {
       setTimeout(checkFeeds, 5000);
@@ -38,12 +37,11 @@ function startRssUpdates(state, updatePostsCallback) {
             .map((post) => ({
               ...post,
               feedId: feed.id,
-              id: `post-${Date.now()}-${Math.random()}`,
+              id: post-${Date.now()}-${Math.random()},
             }));
 
           if (newPosts.length > 0) {
             state.posts.push(...newPosts);
-            updatePostsCallback(state.posts, state);
           }
         })
         .catch(() => {})
@@ -55,23 +53,17 @@ function startRssUpdates(state, updatePostsCallback) {
   };
   setTimeout(checkFeeds, 5000);
 }
-function showFeedsAndPosts() {
-  const postsBlock = document.querySelector('.posts');
-  const feedsBlock = document.querySelector('.feeds');
-  if (postsBlock) postsBlock.classList.remove('d-none');
-  if (feedsBlock) feedsBlock.classList.remove('d-none');
-}
 
 export default (elements, state) => {
   const { form, input, infoText } = elements;
 
   yup.setLocale({
     mixed: {
-      required: 'form.errors.required',
-      notOneOf: 'form.errors.notOneOf',
+      required: 'Заполни это поле',
+      notOneOf: 'RSS уже существует',
     },
     string: {
-      url: 'form.errors.url',
+      url: 'Ссылка должна быть валидным URL',
     },
   });
 
@@ -82,7 +74,7 @@ export default (elements, state) => {
     return schema.validate({ url }, { abortEarly: false });
   };
 
-  startRssUpdates(state, renderPosts);
+  startRssUpdates(state);
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -94,7 +86,9 @@ export default (elements, state) => {
       state.form.valid = true;
       state.form.error = null;
 
-      showInfo(i18next.t('form.success'), infoText);
+      infoText.textContent = i18next.t('form.success');
+      infoText.classList.remove('d-none', 'text-danger');
+      infoText.classList.add('text-success');
       rssLoaded = true;
       input.setAttribute('readonly', true);
 
@@ -111,7 +105,7 @@ export default (elements, state) => {
             if (err.isParsing) throw new Error('rss.invalid');
             throw err;
           }
-          const feedId = `feed-${Date.now()}-${Math.random()}`;
+    const feedId = `feed-${Date.now()}-${Math.random()}`;
           const feedData = {
             id: feedId,
             url,
@@ -128,10 +122,6 @@ export default (elements, state) => {
             });
           });
 
-          renderFeeds(state.feeds);
-          renderPosts(state.posts, state);
-          showFeedsAndPosts();
-
           form.reset();
           input.classList.remove('is-invalid');
           input.removeAttribute('readonly');
@@ -146,13 +136,14 @@ export default (elements, state) => {
           } else {
             message = i18next.t('form.errors.default');
           }
-          showError(message, infoText);
+          state.form.valid = false;
+          state.form.error = message;
           input.removeAttribute('readonly');
         });
     } catch (err) {
       state.form.valid = false;
       const code = err.errors ? err.errors[0] : 'form.errors.default';
-      state.form.error = code;
+      state.form.error = i18next.t(code);
       input.classList.add('is-invalid');
       infoText.textContent = i18next.t(code);
       infoText.classList.remove('d-none');
@@ -160,11 +151,13 @@ export default (elements, state) => {
       infoText.classList.add('text-danger');
     }
   });
+
   input.addEventListener('input', async () => {
     const url = input.value.trim();
     try {
       await validate(url, state.feeds);
-      input.classList.remove('is-invalid');
+      state.form.valid = true;
+      state.form.error = null;
       if (!rssLoaded) {
         infoText.classList.add('d-none');
       } else {
@@ -173,7 +166,9 @@ export default (elements, state) => {
         infoText.classList.add('text-success');
       }
     } catch (err) {
+      state.form.valid = false;
       const code = err.errors ? err.errors[0] : '';
+      state.form.error = i18next.t(code);
       input.classList.add('is-invalid');
       infoText.textContent = i18next.t(code);
       infoText.classList.remove('d-none');
