@@ -12,8 +12,6 @@
 2. Запустите в режиме разработки: npm start
 3. Откройте [http://localhost:8080](http://localhost:8080) в браузере.
 4. Для сборки production-версии:make build
-5. Для запуска тестов: make test
-6. Для проверки линтера: make lint
 
 
 Ссылка на сайт: 
