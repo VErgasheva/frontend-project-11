@@ -22,5 +22,5 @@ export default (state, elements) => onChange(state, function (path, value) {
       elements.infoText.classList.remove('text-success');
       elements.infoText.classList.add('text-danger');
     }
-  }
+}
 });
