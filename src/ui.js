@@ -1,4 +1,5 @@
 import { i18next } from './i18n.js';
+import Modal from 'bootstrap/js/dist/modal';
 
 export function renderFeeds(feeds) {
   const feedsList = document.getElementById('feeds_list');
@@ -38,12 +39,14 @@ export function renderPosts(posts, state) {
       e.preventDefault();
       state.readPosts.add(post.id);
       renderPosts(posts, state);
+
       const modalEl = document.getElementById('modal');
       modalEl.querySelector('.modal-title').textContent = post.title;
       modalEl.querySelector('.modal-body').textContent = post.description;
       const fullArticleLink = modalEl.querySelector('.full-article');
       if (fullArticleLink) fullArticleLink.href = post.link;
-      const modal = new window.bootstrap.Modal(modalEl);
+
+      const modal = Modal.getOrCreateInstance(modalEl);
       modal.show();
     });
 
