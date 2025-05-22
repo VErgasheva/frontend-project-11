@@ -43,8 +43,19 @@ export function renderPosts(posts, state) {
       modalEl.querySelector('.modal-body').textContent = post.description;
       const fullArticleLink = modalEl.querySelector('.full-article');
       if (fullArticleLink) fullArticleLink.href = post.link;
-      const modal = new window.bootstrap.Modal(modalEl);
-      modal.show();
+      let ModalConstructor = window.bootstrap?.Modal;
+      if (!ModalConstructor && window.Modal) {
+        ModalConstructor = window.Modal;
+      }
+      if (ModalConstructor) {
+        const modal = new ModalConstructor(modalEl);
+        modal.show();
+      } else {
+        modalEl.classList.add('show');
+        modalEl.style.display = 'block';
+        modalEl.removeAttribute('aria-hidden');
+        modalEl.setAttribute('aria-modal', 'true');
+      }
     });
 
     link.addEventListener('click', () => {
@@ -57,7 +68,6 @@ export function renderPosts(posts, state) {
     postsList.appendChild(li);
   });
 }
-
 export function showInfo(message, infoText) {
   infoText.textContent = message;
   infoText.classList.remove('d-none', 'text-danger');
