@@ -55,7 +55,8 @@ export function renderPosts(posts, state) {
           ? ModalConstructor.getOrCreateInstance(modalEl)
           : new ModalConstructor(modalEl)
         modal.show()
-      } else {
+      } 
+      else {
         modalEl.classList.add('show')
         modalEl.style.display = 'block'
         modalEl.removeAttribute('aria-hidden')

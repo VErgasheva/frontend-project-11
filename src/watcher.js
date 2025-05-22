@@ -15,7 +15,8 @@ export default (state, elements) => onChange(state, function (path, value) {
       elements.input.classList.remove('is-invalid')
       elements.infoText.classList.add('d-none')
       elements.infoText.textContent = ''
-    } else {
+    } 
+    else {
       elements.input.classList.add('is-invalid')
       elements.infoText.textContent = value
       elements.infoText.classList.remove('d-none')

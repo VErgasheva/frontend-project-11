@@ -50,7 +50,7 @@ function startRssUpdates(state, elements) {
           if (err.message === 'network' || err instanceof TypeError) {
             showError(i18next.t('network'), elements.infoText)
           }
-        })
+        }),
     )
 
     Promise.all(feedPromises).finally(() => {
@@ -102,7 +102,8 @@ export default (elements, state) => {
           let feed, posts
           try {
             ({ feed, posts } = parseRss(data.contents))
-          } catch (err) {
+          } 
+          catch (err) {
             if (err.isParsing) throw new Error('rss.invalid')
             throw err
           }
@@ -136,9 +137,11 @@ export default (elements, state) => {
           let message
           if (err.message === 'network' || err instanceof TypeError) {
             message = i18next.t('network')
-          } else if (err.message === 'rss.invalid') {
+          } 
+          else if (err.message === 'rss.invalid') {
             message = i18next.t('rss.invalid')
-          } else {
+          } 
+          else {
             message = i18next.t('form.errors.default')
           }
           state.form.valid = false
@@ -147,7 +150,8 @@ export default (elements, state) => {
           form.querySelector('button[type="submit"]').removeAttribute('disabled')
           showError(message, infoText)
         })
-    } catch (err) {
+    } 
+    catch (err) {
       state.form.valid = false
       const code = err.errors ? err.errors[0] : 'form.errors.default'
       const message = i18next.t(code)
@@ -164,7 +168,8 @@ export default (elements, state) => {
       infoText.textContent = ''
       infoText.classList.add('d-none')
       input.classList.remove('is-invalid')
-    } catch (err) {
+    } 
+    catch (err) {
       state.form.valid = false
       const code = err.errors ? err.errors[0] : 'form.errors.default'
       const message = i18next.t(code)
