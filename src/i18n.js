@@ -1,4 +1,4 @@
-import i18next from 'i18next';
+import i18next from 'i18next'
 
 const resources = {
   ru: {
@@ -20,15 +20,15 @@ const resources = {
       'network': 'Ошибка сети',
     },
   },
-};
+}
 
-const i18nInstance = i18next.createInstance();
+const i18nInstance = i18next.createInstance()
 
 export default () =>
   i18nInstance.init({
     lng: 'ru',
     debug: false,
     resources,
-  });
+  })
 
-export { i18nInstance as i18next };
+export { i18nInstance as i18next }
