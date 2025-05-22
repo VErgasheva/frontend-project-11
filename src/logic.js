@@ -6,13 +6,14 @@ const getValidationSchema = (feeds) => (
   yup.object().shape({
     url: yup
       .string()
-      .required('Заполни это поле')
-      .url('Ссылка должна быть валидным URL')
-      .notOneOf(feeds.map((f) => f.url), 'RSS уже существует'),
+      .required('form.errors.required')
+      .url('form.errors.url')
+      .notOneOf(feeds.map((f) => f.url), 'form.errors.notOneOf'),
   })
 );
 
 const getProxyUrl = (url) => `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`;
+
 function startRssUpdates(state) {
   const checkFeeds = () => {
     if (state.feeds.length === 0) {
@@ -37,7 +38,7 @@ function startRssUpdates(state) {
               ...post,
               feedId: feed.id,
               id: `post-${Date.now()}-${Math.random()}`,
-          }));
+            }));
 
           if (newPosts.length > 0) {
             state.posts.push(...newPosts);
@@ -53,16 +54,16 @@ function startRssUpdates(state) {
   setTimeout(checkFeeds, 5000);
 }
 
-export default (elements, state) => {
+export default(elements, state) => {
   const { form, input, infoText } = elements;
 
   yup.setLocale({
     mixed: {
-      required: 'Заполни это поле',
-      notOneOf: 'RSS уже существует',
+      required: 'form.errors.required',
+      notOneOf: 'form.errors.notOneOf',
     },
     string: {
-      url: 'Ссылка должна быть валидным URL',
+      url: 'form.errors.url',
     },
   });
 
@@ -104,7 +105,7 @@ export default (elements, state) => {
             if (err.isParsing) throw new Error('rss.invalid');
             throw err;
           }
-    const feedId = `feed-${Date.now()}-${Math.random()}`;
+          const feedId = `feed-${Date.now()}-${Math.random()}`;
           const feedData = {
             id: feedId,
             url,
@@ -117,7 +118,7 @@ export default (elements, state) => {
             state.posts.push({
               ...post,
               feedId,
-              id: `post-${Date.now()}-${Math.random()}`,
+              id: `post-${Date.now()}-${Math.random()}`
             });
           });
 
@@ -137,14 +138,23 @@ export default (elements, state) => {
           }
           state.form.valid = false;
           state.form.error = message;
+
+          input.classList.add('is-invalid');
+          infoText.textContent = message;
+          infoText.classList.remove('d-none');
+          infoText.classList.remove('text-success');
+          infoText.classList.add('text-danger');
+
           input.removeAttribute('readonly');
         });
     } catch (err) {
       state.form.valid = false;
       const code = err.errors ? err.errors[0] : 'form.errors.default';
-      state.form.error = i18next.t(code);
+      const message = i18next.t(code);
+      state.form.error = message;
+
       input.classList.add('is-invalid');
-      infoText.textContent = i18next.t(code);
+      infoText.textContent = message;
       infoText.classList.remove('d-none');
       infoText.classList.remove('text-success');
       infoText.classList.add('text-danger');
@@ -157,6 +167,7 @@ export default (elements, state) => {
       await validate(url, state.feeds);
       state.form.valid = true;
       state.form.error = null;
+      input.classList.remove('is-invalid');
       if (!rssLoaded) {
         infoText.classList.add('d-none');
       } else {
@@ -166,10 +177,11 @@ export default (elements, state) => {
       }
     } catch (err) {
       state.form.valid = false;
-      const code = err.errors ? err.errors[0] : '';
-      state.form.error = i18next.t(code);
+      const code = err.errors ? err.errors[0] : 'form.errors.default';
+      const message = i18next.t(code);
+      state.form.error = message;
       input.classList.add('is-invalid');
-      infoText.textContent = i18next.t(code);
+      infoText.textContent = message;
       infoText.classList.remove('d-none');
       infoText.classList.remove('text-success');
       infoText.classList.add('text-danger');
