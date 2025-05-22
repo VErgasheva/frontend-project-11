@@ -48,8 +48,6 @@ function startRssUpdates(state, elements) {
           }
         })
         .catch(() => {
-          state.form.valid = false;
-          state.form.error = i18next.t('network');
         })
     );
 
@@ -90,6 +88,7 @@ export default (elements, state) => {
       state.form.error = null;
 
       input.setAttribute('readonly', true);
+      form.querySelector('button[type="submit"]').setAttribute('disabled', true);
 
       fetch(getProxyUrl(url))
         .then((response) => {
@@ -125,6 +124,7 @@ export default (elements, state) => {
           state.form.valid = true;
           state.form.error = null;
           input.removeAttribute('readonly');
+          form.querySelector('button[type="submit"]').removeAttribute('disabled');
           input.focus();
 
           showInfo(i18next.t('form.success'), infoText);
@@ -159,12 +159,14 @@ export default (elements, state) => {
       state.form.error = null;
       infoText.textContent = '';
       infoText.classList.add('d-none');
+      input.classList.remove('is-invalid');
     } catch (err) {
       state.form.valid = false;
       const code = err.errors ? err.errors[0] : 'form.errors.default';
       const message = i18next.t(code);
       state.form.error = message;
       showError(message, infoText);
+      input.classList.add('is-invalid');
     }
   });
 };
