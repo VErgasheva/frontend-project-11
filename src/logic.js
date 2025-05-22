@@ -45,6 +45,7 @@ function startRssUpdates(state) {
           }
         })
         .catch((err) => {
+          infoText.textContent = 'Ошибка сети';
         })
     );
     Promise.all(feedPromises)
