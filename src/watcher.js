@@ -10,17 +10,22 @@ export default (state, elements) => onChange(state, function (path, value) {
     renderPosts(state.posts, state);
     elements.postsBlock.classList.remove('d-none');
   }
-  if (path === 'form.error' || path === 'form.valid') {
-    if (state.form.valid) {
-      elements.input.classList.remove('is-invalid');
-      elements.infoText.classList.add('d-none');
-      elements.infoText.textContent = '';
-    } else {
+  if (path === 'form.error') {
+    if (value) {
       elements.input.classList.add('is-invalid');
       elements.infoText.textContent = value;
       elements.infoText.classList.remove('d-none');
       elements.infoText.classList.remove('text-success');
       elements.infoText.classList.add('text-danger');
+    } else {
+      elements.input.classList.remove('is-invalid');
+      elements.infoText.classList.add('d-none');
+      elements.infoText.textContent = '';
     }
-}
+  }
+  if (path === 'form.valid' && state.form.valid && !state.form.error) {
+    elements.input.classList.remove('is-invalid');
+    elements.infoText.classList.add('d-none');
+    elements.infoText.textContent = '';
+  }
 });
