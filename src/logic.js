@@ -1,6 +1,7 @@
 import * as yup from 'yup';
 import { i18next } from './i18n.js';
 import parseRss from './rssParser.js';
+import { showInfo, showError } from './ui.js';
 
 const getValidationSchema = (feeds) => (
   yup.object().shape({
@@ -49,7 +50,6 @@ function startRssUpdates(state, elements) {
         .catch(() => {
           state.form.valid = false;
           state.form.error = i18next.t('network');
-          // input.removeAttribute('readonly'); // не нужно здесь, только при добавлении
         })
     );
 
@@ -59,9 +59,8 @@ function startRssUpdates(state, elements) {
   };
   setTimeout(checkFeeds, 5000);
 }
-
 export default (elements, state) => {
-  const { form, input } = elements;
+  const { form, input, infoText } = elements;
 
   yup.setLocale({
     mixed: {
@@ -72,8 +71,6 @@ export default (elements, state) => {
       url: 'form.errors.url',
     },
   });
-
-  let rssLoaded = false;
 
   const validate = (url, feeds) => {
     const schema = getValidationSchema(feeds);
@@ -92,7 +89,6 @@ export default (elements, state) => {
       state.form.valid = true;
       state.form.error = null;
 
-      rssLoaded = true;
       input.setAttribute('readonly', true);
 
       fetch(getProxyUrl(url))
@@ -130,6 +126,8 @@ export default (elements, state) => {
           state.form.error = null;
           input.removeAttribute('readonly');
           input.focus();
+
+          showInfo(i18next.t('form.success'), infoText);
         })
         .catch((err) => {
           let message;
@@ -143,26 +141,30 @@ export default (elements, state) => {
           state.form.valid = false;
           state.form.error = message;
           input.removeAttribute('readonly');
+          showError(message, infoText);
         });
     } catch (err) {
       state.form.valid = false;
       const code = err.errors ? err.errors[0] : 'form.errors.default';
       const message = i18next.t(code);
       state.form.error = message;
+      showError(message, infoText);
     }
   });
-
   input.addEventListener('input', async () => {
     const url = input.value.trim();
     try {
       await validate(url, state.feeds);
       state.form.valid = true;
       state.form.error = null;
+      infoText.textContent = '';
+      infoText.classList.add('d-none');
     } catch (err) {
       state.form.valid = false;
       const code = err.errors ? err.errors[0] : 'form.errors.default';
       const message = i18next.t(code);
       state.form.error = message;
+      showError(message, infoText);
     }
   });
 };

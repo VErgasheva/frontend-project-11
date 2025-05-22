@@ -7,7 +7,7 @@ export function renderFeeds(feeds) {
   feeds.forEach((feed) => {
     const li = document.createElement('li');
     li.className = 'list-group-item';
-    li.innerHTML = `<h5>${feed.title}</h5><p class="text-muted">${feed.description}</p>`;
+    li.innerHTML = `<h5>${feed.title}</h5><p>${feed.description}</p>`;
     feedsList.appendChild(li);
   });
 }
@@ -57,15 +57,16 @@ export function renderPosts(posts, state) {
     postsList.appendChild(li);
   });
 }
-
 export function showInfo(message, infoText) {
   infoText.textContent = message;
   infoText.classList.remove('d-none', 'text-danger');
   infoText.classList.add('text-success');
+  infoText.classList.remove('d-none');
 }
 
 export function showError(message, infoText) {
   infoText.textContent = message;
   infoText.classList.remove('d-none', 'text-success');
   infoText.classList.add('text-danger');
+  infoText.classList.remove('d-none');
 }
