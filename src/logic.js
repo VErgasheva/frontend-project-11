@@ -12,15 +12,18 @@ const getValidationSchema = (feeds) => (
   })
 );
 
-const getProxyUrl = (url) => `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`;
+const getProxyUrl = (url) =>
+  `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`;
 
 function startRssUpdates(state, elements) {
   const { infoText, input } = elements;
+
   const checkFeeds = () => {
     if (state.feeds.length === 0) {
       setTimeout(checkFeeds, 5000);
       return;
     }
+
     const feedPromises = state.feeds.map((feed) =>
       fetch(getProxyUrl(feed.url))
         .then((response) => {
@@ -45,25 +48,26 @@ function startRssUpdates(state, elements) {
             state.posts.push(...newPosts);
           }
         })
-        .catch((err) => {
-          state.form.valid = false;
-          state.form.error = 'Ошибка сети';
-          infoText.textContent = 'Ошибка сети';
-          infoText.classList.remove('d-none', 'text-success');
-          infoText.classList.add('text-danger');
-          input.classList.add('is-invalid');
+        .catch(() => {
+          if (state.form.valid) {
+            state.form.valid = false;
+            state.form.error = 'Ошибка сети';
+            infoText.textContent = 'Ошибка сети';
+            infoText.classList.remove('d-none', 'text-success');
+            infoText.classList.add('text-danger');
+            input.classList.add('is-invalid');
+          }
         })
     );
-    Promise.all(feedPromises)
-      .finally(() => {
-        setTimeout(checkFeeds, 5000);
-      });
+
+    Promise.all(feedPromises).finally(() => {
+      setTimeout(checkFeeds, 5000);
+    });
   };
   setTimeout(checkFeeds, 5000);
 }
 
-
-export default(elements, state) => {
+export default (elements, state) => {
   const { form, input, infoText } = elements;
 
   yup.setLocale({
@@ -86,90 +90,85 @@ export default(elements, state) => {
   startRssUpdates(state, elements);
 
   form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const url = input.value.trim();
+    e.preventDefault();
+    const url = input.value.trim();
 
-  try {
-    await validate(url, state.feeds);
+    try {
+      await validate(url, state.feeds);
 
-    state.form.valid = true;
-    state.form.error = null;
+      state.form.valid = true;
+      state.form.error = null;
 
-    infoText.textContent = i18next.t('form.success');
-    infoText.classList.remove('d-none', 'text-danger');
-    infoText.classList.add('text-success');
-    rssLoaded = true;
-    input.setAttribute('readonly', true);
+      infoText.textContent = i18next.t('form.success');
+      infoText.classList.remove('d-none', 'text-danger');
+      infoText.classList.add('text-success');
+      rssLoaded = true;
+      input.setAttribute('readonly', true);
 
-    fetch(getProxyUrl(url))
-      .then((response) => {
-        if (!response.ok) throw new Error('network');
-        return response.json();
-      })
-      .then((data) => {
-        let feed, posts;
-        try {
-          ({ feed, posts } = parseRss(data.contents));
-        } catch (err) {
-          if (err.isParsing) throw new Error('rss.invalid');
-          throw err;
-        }
-        const feedId = `feed-${Date.now()}-${Math.random()}`;
-        const feedData = {
-          id: feedId,
-          url,
-          title: feed.title,
-          description: feed.description,
-        };
-        state.feeds.push(feedData);
+      fetch(getProxyUrl(url))
+        .then((response) => {
+          if (!response.ok) throw new Error('network');
+          return response.json();
+        })
+        .then((data) => {
+          let feed, posts;
+          try {
+            ({ feed, posts } = parseRss(data.contents));
+          } catch (err) {
+            if (err.isParsing) throw new Error('rss.invalid');
+            throw err;
+          }
+          const feedId = `feed-${Date.now()}-${Math.random()}`;
+          const feedData = {
+            id: feedId,
+            url,
+            title: feed.title,
+            description: feed.description,
+          };
+          state.feeds.push(feedData);
 
-        posts.forEach((post) => {
-          state.posts.push({
-            ...post,
-            feedId,
-            id: `post-${Date.now()}-${Math.random()}`
+          posts.forEach((post) => {
+            state.posts.push({
+              ...post,
+              feedId,
+              id: `post-${Date.now()}-${Math.random()}`,
+            });
           });
+
+          form.reset();
+          input.classList.remove('is-invalid');
+          input.removeAttribute('readonly');
+          input.focus();
+        })
+        .catch((err) => {
+          let message;
+          if (err.message === 'network') {
+            message = 'Ошибка сети';
+          } else if (err.message === 'rss.invalid') {
+            message = i18next.t('rss.invalid');
+          } else {
+            message = i18next.t('form.errors.default');
+          }
+          state.form.valid = false;
+          state.form.error = message;
+          input.classList.add('is-invalid');
+          infoText.textContent = message;
+          infoText.classList.remove('d-none', 'text-success');
+          infoText.classList.add('text-danger');
+          input.removeAttribute('readonly');
         });
+    } catch (err) {
+      state.form.valid = false;
+      const code = err.errors ? err.errors[0] : 'form.errors.default';
+      const message = i18next.t(code);
+      state.form.error = message;
 
-        form.reset();
-        input.classList.remove('is-invalid');
-        input.removeAttribute('readonly');
-        input.focus();
-      })
-      .catch((err) => {
-        let message;
-        if (err.message === 'network') {
-          message = 'Ошибка сети';
-        } else if (err.message === 'rss.invalid') {
-          message = i18next.t('rss.invalid');
-        } else {
-          message = i18next.t('form.errors.default');
-        }
-        state.form.valid = false;
-        state.form.error = message;
-
-        input.classList.add('is-invalid');
-        infoText.textContent = message;
-        infoText.classList.remove('d-none');
-        infoText.classList.remove('text-success');
-        infoText.classList.add('text-danger');
-
-        input.removeAttribute('readonly');
-      });
-  } catch (err) {
-    state.form.valid = false;
-    const code = err.errors ? err.errors[0] : 'form.errors.default';
-    const message = i18next.t(code);
-    state.form.error = message;
-
-    input.classList.add('is-invalid');
-    infoText.textContent = message;
-    infoText.classList.remove('d-none');
-    infoText.classList.remove('text-success');
-    infoText.classList.add('text-danger');
-  }
-});
-
+      input.classList.add('is-invalid');
+      infoText.textContent = message;
+      infoText.classList.remove('d-none', 'text-success');
+      infoText.classList.add('text-danger');
+    }
+  });
   input.addEventListener('input', async () => {
     const url = input.value.trim();
     try {
@@ -191,8 +190,7 @@ export default(elements, state) => {
       state.form.error = message;
       input.classList.add('is-invalid');
       infoText.textContent = message;
-      infoText.classList.remove('d-none');
-      infoText.classList.remove('text-success');
+      infoText.classList.remove('d-none', 'text-success');
       infoText.classList.add('text-danger');
     }
   });
