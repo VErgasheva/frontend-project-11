@@ -3,16 +3,16 @@ import { i18next } from './i18n.js'
 import parseRss from './rssParser.js'
 import { showInfo, showError } from './ui.js'
 
-const getValidationSchema = (feeds) =>
+const getValidationSchema = feeds =>
   yup.object().shape({
     url: yup
       .string()
       .required('form.errors.required')
       .url('form.errors.url')
-      .notOneOf(feeds.map((f) => f.url), 'form.errors.notOneOf'),
+      .notOneOf(feeds.map(f => f.url), 'form.errors.notOneOf'),
   })
 
-const getProxyUrl = (url) =>
+const getProxyUrl = url =>
   `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`
 
 function startRssUpdates(state, elements) {
@@ -22,7 +22,7 @@ function startRssUpdates(state, elements) {
       return
     }
 
-    const feedPromises = state.feeds.map((feed) =>
+    const feedPromises = state.feeds.map(feed =>
       fetch(getProxyUrl(feed.url))
         .then((response) => {
           if (!response.ok) throw new Error('network')
@@ -31,16 +31,17 @@ function startRssUpdates(state, elements) {
         .then((data) => {
           const { posts } = parseRss(data.contents)
           const existingLinks = state.posts
-            .filter((p) => p.feedId === feed.id)
-            .map((p) => p.link)
+            .filter(p => p.feedId === feed.id)
+            .map(p => p.link)
 
           const newPosts = posts
-            .filter((post) => !existingLinks.includes(post.link))
-            .map((post) => ({
+            .filter(post => !existingLinks.includes(post.link))
+            .map(post => ({
               ...post,
               feedId: feed.id,
               id: `post-${Date.now()}-${Math.random()}`,
             }))
+
           if (newPosts.length > 0) {
             state.posts.push(...newPosts)
           }
@@ -49,7 +50,7 @@ function startRssUpdates(state, elements) {
           if (err.message === 'network' || err instanceof TypeError) {
             showError(i18next.t('network'), elements.infoText)
           }
-        }),
+        })
     )
 
     Promise.all(feedPromises).finally(() => {
@@ -58,6 +59,7 @@ function startRssUpdates(state, elements) {
   }
   setTimeout(checkFeeds, 5000)
 }
+
 export default (elements, state) => {
   const { form, input, infoText } = elements
 

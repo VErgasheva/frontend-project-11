@@ -35,5 +35,4 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const watchedState = createWatcher(state, elements)
   initLogic(elements, watchedState)
-},)
-
+})

@@ -42,7 +42,9 @@ export function renderPosts(posts, state) {
       modalEl.querySelector('.modal-title').textContent = post.title
       modalEl.querySelector('.modal-body').textContent = post.description
       const fullArticleLink = modalEl.querySelector('.full-article')
-      if (fullArticleLink) fullArticleLink.href = post.link
+      if (fullArticleLink) {
+        fullArticleLink.href = post.link
+      }
 
       let ModalConstructor = window.bootstrap?.Modal
       if (!ModalConstructor && window.Modal) {
