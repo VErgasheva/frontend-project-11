@@ -14,7 +14,8 @@ const getValidationSchema = (feeds) => (
 
 const getProxyUrl = (url) => `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`;
 
-function startRssUpdates(state) {
+function startRssUpdates(state, elements) {
+  const { infoText, input } = elements;
   const checkFeeds = () => {
     if (state.feeds.length === 0) {
       setTimeout(checkFeeds, 5000);
@@ -82,7 +83,7 @@ export default(elements, state) => {
     return schema.validate({ url }, { abortEarly: false });
   };
 
-  startRssUpdates(state);
+  startRssUpdates(state, elements);
 
   form.addEventListener('submit', async (e) => {
   e.preventDefault();
