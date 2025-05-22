@@ -38,23 +38,36 @@ export function renderPosts(posts, state) {
       e.preventDefault();
       state.readPosts.add(post.id);
       renderPosts(posts, state);
+
       const modalEl = document.getElementById('modal');
       modalEl.querySelector('.modal-title').textContent = post.title;
       modalEl.querySelector('.modal-body').textContent = post.description;
       const fullArticleLink = modalEl.querySelector('.full-article');
       if (fullArticleLink) fullArticleLink.href = post.link;
+
       let ModalConstructor = window.bootstrap?.Modal;
       if (!ModalConstructor && window.Modal) {
         ModalConstructor = window.Modal;
       }
       if (ModalConstructor) {
-        const modal = new ModalConstructor(modalEl);
+        const modal = ModalConstructor.getOrCreateInstance
+          ? ModalConstructor.getOrCreateInstance(modalEl)
+          : new ModalConstructor(modalEl);
         modal.show();
       } else {
         modalEl.classList.add('show');
         modalEl.style.display = 'block';
         modalEl.removeAttribute('aria-hidden');
         modalEl.setAttribute('aria-modal', 'true');
+        const closeBtns = modalEl.querySelectorAll('[data-bs-dismiss="modal"]');
+        closeBtns.forEach((btn) => {
+          btn.onclick = () => {
+            modalEl.classList.remove('show');
+            modalEl.style.display = 'none';
+            modalEl.setAttribute('aria-hidden', 'true');
+            modalEl.removeAttribute('aria-modal');
+          };
+        });
       }
     });
 
