@@ -57,6 +57,7 @@ export function renderPosts(posts, state) {
     postsList.appendChild(li);
   });
 }
+
 export function showInfo(message, infoText) {
   infoText.textContent = message;
   infoText.classList.remove('d-none', 'text-danger');
