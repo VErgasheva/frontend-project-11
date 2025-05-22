@@ -1,5 +1,5 @@
 import onChange from 'on-change'
-import { renderFeeds, renderPosts, showInfo, showError } from './ui.js'
+import { renderFeeds, renderPosts } from './ui.js'
 
 export default (state, elements) => onChange(state, function (path, value) {
   if (path === 'feeds') {

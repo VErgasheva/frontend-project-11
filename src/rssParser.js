@@ -16,14 +16,14 @@ export default function parseRss(xmlString) {
   const posts = items.map(item => ({
     title: item.querySelector('title')?.textContent ?? '',
     link: item.querySelector('link')?.textContent ?? '',
-    description: item.querySelector('description')?.textContent ?? ''
+    description: item.querySelector('description')?.textContent ?? '',
   }))
 
   return {
     feed: {
       title: feedTitle,
-      description: feedDescription
+      description: feedDescription,
     },
-    posts
+    posts,
   }
 }

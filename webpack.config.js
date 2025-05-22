@@ -11,7 +11,7 @@ export default {
   output: {
     filename: 'main.js',
     path: path.resolve(__dirname, 'dist'),
-    clean: true
+    clean: true,
   },
   mode: 'development',
   module: {
@@ -21,14 +21,14 @@ export default {
         use: [
           'style-loader',
           'css-loader',
-          'sass-loader'
-        ]
-      }
-    ]
+          'sass-loader',
+        ],
+      },
+    ],
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './index.html'
+      template: './index.html',
     }),
     new CopyWebpackPlugin({
       patterns: [
@@ -42,8 +42,8 @@ export default {
         { from: 'src/logic.js', to: 'src/' },
         { from: 'src/rssParser.js', to: 'src/' },
         { from: 'src/styles.scss', to: 'src/' },
-        { from: 'src/ui.js', to: 'src/' }
-      ]
-    })
-  ]
+        { from: 'src/ui.js', to: 'src/' },
+      ],
+    }),
+  ],
 }

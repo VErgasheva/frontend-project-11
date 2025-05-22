@@ -9,10 +9,10 @@ const getValidationSchema = (feeds) =>
       .string()
       .required('form.errors.required')
       .url('form.errors.url')
-      .notOneOf(feeds.map(f => f.url), 'form.errors.notOneOf')
+      .notOneOf(feeds.map((f) => f.url), 'form.errors.notOneOf'),
   })
 
-const getProxyUrl = url =>
+const getProxyUrl = (url) =>
   `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`
 
 function startRssUpdates(state, elements) {
@@ -22,34 +22,34 @@ function startRssUpdates(state, elements) {
       return
     }
 
-    const feedPromises = state.feeds.map(feed =>
+    const feedPromises = state.feeds.map((feed) =>
       fetch(getProxyUrl(feed.url))
-        .then(response => {
+        .then((response) => {
           if (!response.ok) throw new Error('network')
           return response.json()
         })
-        .then(data => {
+        .then((data) => {
           const { posts } = parseRss(data.contents)
           const existingLinks = state.posts
-            .filter(p => p.feedId === feed.id)
-            .map(p => p.link)
+            .filter((p) => p.feedId === feed.id)
+            .map((p) => p.link)
 
           const newPosts = posts
-            .filter(post => !existingLinks.includes(post.link))
-            .map(post => ({
+            .filter((post) => !existingLinks.includes(post.link))
+            .map((post) => ({
               ...post,
               feedId: feed.id,
-              id: `post-${Date.now()}-${Math.random()}`
+              id: `post-${Date.now()}-${Math.random()}`,
             }))
           if (newPosts.length > 0) {
             state.posts.push(...newPosts)
           }
         })
-        .catch(err => {
+        .catch((err) => {
           if (err.message === 'network' || err instanceof TypeError) {
             showError(i18next.t('network'), elements.infoText)
           }
-        })
+        }),
     )
 
     Promise.all(feedPromises).finally(() => {
@@ -64,11 +64,11 @@ export default (elements, state) => {
   yup.setLocale({
     mixed: {
       required: 'form.errors.required',
-      notOneOf: 'form.errors.notOneOf'
+      notOneOf: 'form.errors.notOneOf',
     },
     string: {
-      url: 'form.errors.url'
-    }
+      url: 'form.errors.url',
+    },
   })
 
   const validate = (url, feeds) => {
@@ -78,7 +78,7 @@ export default (elements, state) => {
 
   startRssUpdates(state, elements)
 
-  form.addEventListener('submit', async e => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault()
     const url = input.value.trim()
 
@@ -92,11 +92,11 @@ export default (elements, state) => {
       form.querySelector('button[type="submit"]').setAttribute('disabled', true)
 
       fetch(getProxyUrl(url))
-        .then(response => {
+        .then((response) => {
           if (!response.ok) throw new Error('network')
           return response.json()
         })
-        .then(data => {
+        .then((data) => {
           let feed, posts
           try {
             ({ feed, posts } = parseRss(data.contents))
@@ -109,15 +109,15 @@ export default (elements, state) => {
             id: feedId,
             url,
             title: feed.title,
-            description: feed.description
+            description: feed.description,
           }
           state.feeds.push(feedData)
 
-          posts.forEach(post => {
+          posts.forEach((post) => {
             state.posts.push({
               ...post,
               feedId,
-              id: `post-${Date.now()}-${Math.random()}`
+              id: `post-${Date.now()}-${Math.random()}`,
             })
           })
 
@@ -130,7 +130,7 @@ export default (elements, state) => {
 
           showInfo(i18next.t('form.success'), infoText)
         })
-        .catch(err => {
+        .catch((err) => {
           let message
           if (err.message === 'network' || err instanceof TypeError) {
             message = i18next.t('network')

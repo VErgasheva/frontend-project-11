@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     input: document.getElementById('url-input'),
     infoText: document.getElementById('info_text'),
     feedsBlock: document.querySelector('.feeds'),
-    postsBlock: document.querySelector('.posts')
+    postsBlock: document.querySelector('.posts'),
   }
 
   const state = {
@@ -29,12 +29,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     readPosts: new Set(),
     form: {
       valid: true,
-      error: null
-    }
+      error: null,
+    },
   }
 
   const watchedState = createWatcher(state, elements)
   initLogic(elements, watchedState)
-}
-)
+},)
 
