@@ -47,7 +47,10 @@ function startRssUpdates(state, elements) {
             state.posts.push(...newPosts);
           }
         })
-        .catch(() => {
+        .catch((err) => {
+          if (err.message === 'network' || err instanceof TypeError) {
+            showError(i18next.t('network'), elements.infoText);
+          }
         })
     );
 
@@ -89,7 +92,7 @@ export default (elements, state) => {
 
       input.setAttribute('readonly', true);
       form.querySelector('button[type="submit"]').setAttribute('disabled', true);
-
+      
       fetch(getProxyUrl(url))
         .then((response) => {
           if (!response.ok) throw new Error('network');
@@ -131,7 +134,7 @@ export default (elements, state) => {
         })
         .catch((err) => {
           let message;
-          if (err.message === 'network') {
+          if (err.message === 'network' || err instanceof TypeError) {
             message = i18next.t('network');
           } else if (err.message === 'rss.invalid') {
             message = i18next.t('rss.invalid');
@@ -141,6 +144,7 @@ export default (elements, state) => {
           state.form.valid = false;
           state.form.error = message;
           input.removeAttribute('readonly');
+          form.querySelector('button[type="submit"]').removeAttribute('disabled');
           showError(message, infoText);
         });
     } catch (err) {
