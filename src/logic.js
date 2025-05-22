@@ -102,7 +102,7 @@ export default (elements, state) => {
           let feed, posts
           try {
             ({ feed, posts } = parseRss(data.contents))
-          } 
+          }
           catch (err) {
             if (err.isParsing) throw new Error('rss.invalid')
             throw err
@@ -137,10 +137,10 @@ export default (elements, state) => {
           let message
           if (err.message === 'network' || err instanceof TypeError) {
             message = i18next.t('network')
-          } 
+          }
           else if (err.message === 'rss.invalid') {
             message = i18next.t('rss.invalid')
-          } 
+          }
           else {
             message = i18next.t('form.errors.default')
           }
@@ -150,7 +150,7 @@ export default (elements, state) => {
           form.querySelector('button[type="submit"]').removeAttribute('disabled')
           showError(message, infoText)
         })
-    } 
+    }
     catch (err) {
       state.form.valid = false
       const code = err.errors ? err.errors[0] : 'form.errors.default'
@@ -168,7 +168,7 @@ export default (elements, state) => {
       infoText.textContent = ''
       infoText.classList.add('d-none')
       input.classList.remove('is-invalid')
-    } 
+    }
     catch (err) {
       state.form.valid = false
       const code = err.errors ? err.errors[0] : 'form.errors.default'

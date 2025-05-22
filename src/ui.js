@@ -55,7 +55,7 @@ export function renderPosts(posts, state) {
           ? ModalConstructor.getOrCreateInstance(modalEl)
           : new ModalConstructor(modalEl)
         modal.show()
-      } 
+      }
       else {
         modalEl.classList.add('show')
         modalEl.style.display = 'block'
