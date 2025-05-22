@@ -45,7 +45,12 @@ function startRssUpdates(state) {
           }
         })
         .catch((err) => {
+          state.form.valid = false;
+          state.form.error = 'Ошибка сети';
           infoText.textContent = 'Ошибка сети';
+          infoText.classList.remove('d-none', 'text-success');
+          infoText.classList.add('text-danger');
+          input.classList.add('is-invalid');
         })
     );
     Promise.all(feedPromises)
