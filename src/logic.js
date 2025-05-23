@@ -95,7 +95,7 @@ export default (elements, state) => {
         let feed, posts
         try {
           ({ feed, posts } = parseRss(data.contents))
-        } 
+        }
         catch (err) {
           if (err.isParsingError) throw new Error('rss.invalid')
           throw err
