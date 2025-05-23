@@ -27,6 +27,7 @@ export default function appInit() {
       form: {
         valid: true,
         error: null,
+        success: null,
       },
     }
 

@@ -118,6 +118,7 @@ export default (elements, state) => {
         form.reset()
         state.form.valid = true
         state.form.error = null
+        state.form.success = i18next.t('form.success')
         input.removeAttribute('readonly')
         form.querySelector('button[type="submit"]').removeAttribute('disabled')
         input.focus()
@@ -138,6 +139,7 @@ export default (elements, state) => {
         }
         state.form.valid = false
         state.form.error = message
+        state.form.success = null
         input.removeAttribute('readonly')
         form.querySelector('button[type="submit"]').removeAttribute('disabled')
       })
