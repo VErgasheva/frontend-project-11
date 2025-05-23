@@ -36,7 +36,7 @@ export default {
         { from: 'webpack.config.js', to: '' },
         { from: 'vercel.json', to: '' },
         { from: 'package.json', to: '' },
-        { from: 'src/counter.js', to: 'src/' },
+        { from: 'src/init.js', to: 'src/' },
         { from: 'src/i18n.js', to: 'src/' },
         { from: 'src/index.js', to: 'src/' },
         { from: 'src/logic.js', to: 'src/' },
