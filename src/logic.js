@@ -22,11 +22,11 @@ function startRssUpdates(state) {
     }
     const feedPromises = state.feeds.map(feed =>
       fetch(getProxyUrl(feed.url))
-        .then(response => {
+        .then((response) => {
           if (!response.ok) throw new Error('network')
           return response.json()
         })
-        .then(data => {
+        .then((data) => {
           const { posts } = parseRss(data.contents)
           const existingLinks = state.posts
             .filter(p => p.feedId === feed.id)
@@ -45,7 +45,7 @@ function startRssUpdates(state) {
           }
         })
         .catch(() => {
-        })
+        }),
     )
     Promise.all(feedPromises).finally(() => {
       setTimeout(update, 5000)
@@ -87,15 +87,16 @@ export default (elements, state) => {
 
         return fetch(getProxyUrl(url))
       })
-      .then(response => {
+      .then((response) => {
         if (!response.ok) throw new Error('network')
         return response.json()
       })
-      .then(data => {
+      .then((data) => {
         let feed, posts
         try {
           ({ feed, posts } = parseRss(data.contents))
-        } catch (err) {
+        } 
+        catch (err) {
           if (err.isParsingError) throw new Error('rss.invalid')
           throw err
         }

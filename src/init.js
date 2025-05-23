@@ -35,4 +35,3 @@ export default function appInit() {
     initLogic(elements, watchedState)
   })
 }
-
