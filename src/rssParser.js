@@ -5,7 +5,7 @@ export default function parseRss(xmlString) {
   const parseError = doc.querySelector('parsererror')
   if (parseError) {
     const error = new Error('Parse error')
-    error.isParsing = true
+    error.isParsingError = true
     throw error
   }
 
