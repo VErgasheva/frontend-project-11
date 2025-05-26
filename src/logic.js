@@ -16,8 +16,8 @@ const getProxyUrl = url =>
 
 function processFeedUpdate(feed, state) {
   return fetch(getProxyUrl(feed.url))
-    .then((response) => response.json())
-    .then((data) => {
+    .then(response => response.json())
+    .then(data => {
       const { posts } = parseRss(data.contents)
       const existingLinks = state.posts
         .filter(p => p.feedId === feed.id)
