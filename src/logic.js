@@ -2,6 +2,16 @@ import * as yup from 'yup'
 import { i18next } from './i18n.js'
 import parseRss from './rssParser.js'
 
+yup.setLocale({
+  mixed: {
+    required: 'form.errors.required',
+    notOneOf: 'form.errors.notOneOf',
+  },
+  string: {
+    url: 'form.errors.url',
+  },
+})
+
 const getValidationSchema = feeds =>
   yup.object().shape({
     url: yup
@@ -35,10 +45,10 @@ function processFeedUpdate(feed, state) {
         state.posts.push(...newPosts)
       }
     })
-    .catch(() => {
+    .catch((err) => {
+      console.error('Ошибка обновления RSS-ленты:', err)
     })
 }
-
 function startRssUpdates(state) {
   const update = () => {
     if (state.feeds.length === 0) {
@@ -54,18 +64,10 @@ function startRssUpdates(state) {
 }
 
 function validateForm(url, feeds) {
-  yup.setLocale({
-    mixed: {
-      required: 'form.errors.required',
-      notOneOf: 'form.errors.notOneOf',
-    },
-    string: {
-      url: 'form.errors.url',
-    },
-  })
   const schema = getValidationSchema(feeds)
   return schema.validate({ url }, { abortEarly: false })
 }
+
 function loadRss(url, state) {
   return fetch(getProxyUrl(url))
     .then((response) => {
@@ -148,9 +150,5 @@ export default (elements, state) => {
         input.removeAttribute('readonly')
         form.querySelector('button[type="submit"]').removeAttribute('disabled')
       })
-  })
-  input.addEventListener('input', () => {
-    state.form.valid = true
-    state.form.error = null
   })
 }
