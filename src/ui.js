@@ -1,23 +1,23 @@
 import { i18next } from './i18n.js'
 
 export function renderFeeds(feeds) {
-  const feedsList = document.getElementById('feeds_list')
-  if (!feedsList) return
-  feedsList.innerHTML = ''
-  feeds.forEach((feed) => {
-    const li = document.createElement('li')
-    li.className = 'list-group-item'
+  const feedsList = document.getElementById('feeds_list');
+  if (!feedsList) return;
+  feedsList.innerHTML = '';
+  feeds.forEach(feed => {
+    const li = document.createElement('li');
+    li.className = 'list-group-item';
 
-    const h5 = document.createElement('h5')
-    h5.textContent = feed.title
+    const h5 = document.createElement('h5');
+    h5.textContent = feed.title;
 
-    const p = document.createElement('p')
-    p.textContent = feed.description
+    const p = document.createElement('p');
+    p.textContent = feed.description;
 
-    li.appendChild(h5)
-    li.appendChild(p)
-    feedsList.appendChild(li)
-  })
+    li.appendChild(h5);
+    li.appendChild(p);
+    feedsList.appendChild(li);
+  });
 }
 
 export function renderPosts(posts, state) {
