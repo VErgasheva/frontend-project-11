@@ -14,39 +14,38 @@ const getValidationSchema = feeds =>
 const getProxyUrl = url =>
   `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`
 
+function processFeedUpdate(feed, state) {
+  return fetch(getProxyUrl(feed.url))
+    .then((response) => response.json())
+    .then((data) => {
+      const { posts } = parseRss(data.contents)
+      const existingLinks = state.posts
+        .filter(p => p.feedId === feed.id)
+        .map(p => p.link)
+
+      const newPosts = posts
+        .filter(post => !existingLinks.includes(post.link))
+        .map(post => ({
+          ...post,
+          feedId: feed.id,
+          id: `post-${Date.now()}-${Math.random()}`,
+        }))
+
+      if (newPosts.length > 0) {
+        state.posts.push(...newPosts)
+      }
+    })
+    .catch(() => {
+    })
+}
+
 function startRssUpdates(state) {
   const update = () => {
     if (state.feeds.length === 0) {
       setTimeout(update, 5000)
       return
     }
-    const feedPromises = state.feeds.map(feed =>
-      fetch(getProxyUrl(feed.url))
-        .then((response) => {
-          if (!response.ok) throw new Error('network')
-          return response.json()
-        })
-        .then((data) => {
-          const { posts } = parseRss(data.contents)
-          const existingLinks = state.posts
-            .filter(p => p.feedId === feed.id)
-            .map(p => p.link)
-
-          const newPosts = posts
-            .filter(post => !existingLinks.includes(post.link))
-            .map(post => ({
-              ...post,
-              feedId: feed.id,
-              id: `post-${Date.now()}-${Math.random()}`,
-            }))
-
-          if (newPosts.length > 0) {
-            state.posts.push(...newPosts)
-          }
-        })
-        .catch(() => {
-        }),
-    )
+    const feedPromises = state.feeds.map(feed => processFeedUpdate(feed, state))
     Promise.all(feedPromises).finally(() => {
       setTimeout(update, 5000)
     })
@@ -54,9 +53,7 @@ function startRssUpdates(state) {
   setTimeout(update, 5000)
 }
 
-export default (elements, state) => {
-  const { form, input } = elements
-
+function validateForm(url, feeds) {
   yup.setLocale({
     mixed: {
       required: 'form.errors.required',
@@ -66,10 +63,44 @@ export default (elements, state) => {
       url: 'form.errors.url',
     },
   })
-  const validate = (url, feeds) => {
-    const schema = getValidationSchema(feeds)
-    return schema.validate({ url }, { abortEarly: false })
-  }
+  const schema = getValidationSchema(feeds)
+  return schema.validate({ url }, { abortEarly: false })
+}
+function loadRss(url, state) {
+  return fetch(getProxyUrl(url))
+    .then((response) => {
+      if (!response.ok) throw new Error('network')
+      return response.json()
+    })
+    .then((data) => {
+      let feed, posts
+      try {
+        ({ feed, posts } = parseRss(data.contents))
+      }
+      catch (err) {
+        if (err.isParsingError) throw new Error('rss.invalid')
+        throw err
+      }
+      const feedId = `feed-${Date.now()}-${Math.random()}`
+      const feedData = {
+        id: feedId,
+        url,
+        title: feed.title,
+        description: feed.description,
+      }
+      state.feeds.push(feedData)
+      posts.forEach((post) => {
+        state.posts.push({
+          ...post,
+          feedId,
+          id: `post-${Date.now()}-${Math.random()}`,
+        })
+      })
+    })
+}
+
+export default (elements, state) => {
+  const { form, input } = elements
 
   startRssUpdates(state)
 
@@ -77,7 +108,7 @@ export default (elements, state) => {
     e.preventDefault()
     const url = input.value.trim()
 
-    validate(url, state.feeds)
+    validateForm(url, state.feeds)
       .then(() => {
         state.form.valid = true
         state.form.error = null
@@ -85,43 +116,16 @@ export default (elements, state) => {
         input.setAttribute('readonly', true)
         form.querySelector('button[type="submit"]').setAttribute('disabled', true)
 
-        return fetch(getProxyUrl(url))
+        return loadRss(url, state)
       })
-      .then((response) => {
-        if (!response.ok) throw new Error('network')
-        return response.json()
-      })
-      .then((data) => {
-        let feed, posts
-        try {
-          ({ feed, posts } = parseRss(data.contents))
-        }
-        catch (err) {
-          if (err.isParsingError) throw new Error('rss.invalid')
-          throw err
-        }
-        const feedId = `feed-${Date.now()}-${Math.random()}`
-        const feedData = {
-          id: feedId,
-          url,
-          title: feed.title,
-          description: feed.description,
-        }
-        state.feeds.push(feedData)
-        posts.forEach((post) => {
-          state.posts.push({
-            ...post,
-            feedId,
-            id: `post-${Date.now()}-${Math.random()}`,
-          })
-        })
-
+      .then(() => {
         form.reset()
         state.form.valid = true
         state.form.error = null
         state.form.success = i18next.t('form.success')
         input.removeAttribute('readonly')
         form.querySelector('button[type="submit"]').removeAttribute('disabled')
+        input.value = ''
         input.focus()
       })
       .catch((err) => {
@@ -145,7 +149,6 @@ export default (elements, state) => {
         form.querySelector('button[type="submit"]').removeAttribute('disabled')
       })
   })
-
   input.addEventListener('input', () => {
     state.form.valid = true
     state.form.error = null

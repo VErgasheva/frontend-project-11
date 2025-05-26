@@ -7,7 +7,15 @@ export function renderFeeds(feeds) {
   feeds.forEach((feed) => {
     const li = document.createElement('li')
     li.className = 'list-group-item'
-    li.innerHTML = `<h5>${feed.title}</h5><p>${feed.description}</p>`
+
+    const h5 = document.createElement('h5')
+    h5.textContent = feed.title
+
+    const p = document.createElement('p')
+    p.textContent = feed.description
+
+    li.appendChild(h5)
+    li.appendChild(p)
     feedsList.appendChild(li)
   })
 }
